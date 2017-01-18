@@ -1,61 +1,62 @@
-var gulp          = require('gulp'),
-    jshint        = require('gulp-jshint'),
-    sass          = require('gulp-sass'),
-    cssnano       = require('gulp-cssnano'),
-    autoprefixer  = require('gulp-autoprefixer'),
-    sourcemaps    = require('gulp-sourcemaps'),
-    concat        = require('gulp-concat'),
+// Grab our gulp packages
+var gulp  = require('gulp'),
+    gutil = require('gulp-util'),
+    sass = require('gulp-sass'),
+    autoprefixer = require('gulp-autoprefixer'),
+    minifycss = require('gulp-minify-css'),
+    jshint = require('gulp-jshint'),
+    stylish = require('jshint-stylish'),
+    uglify = require('gulp-uglify'),
+    concat = require('gulp-concat'),
+    rename = require('gulp-rename'),
+    plumber = require('gulp-plumber'),
+    bower = require('gulp-bower'),
+    babel = require('gulp-babel'),
     browserSync   = require('browser-sync'),
     reload        = browserSync.reload;
 
-// default task to start
-gulp.task('default', ['watch', 'serve']);
+// Compile Sass, Autoprefix and minify
+gulp.task('styles', function() {
+  return gulp.src('./assets/css/scss/**/*.scss')
+    .pipe(plumber(function(error) {
+            gutil.log(gutil.colors.red(error.message));
+            this.emit('end');
+    }))
+    .pipe(sass())
+    .pipe(autoprefixer({
+            browsers: ['last 2 versions'],
+            cascade: false
+        }))
+    .pipe(gulp.dest('./dist/css/'))
+    .pipe(rename({suffix: '.min'}))
+    .pipe(minifycss())
+    .pipe(gulp.dest('./dist/css/'))
+});
 
-gulp.task('jshint', function() {
-  return gulp.src('js/**/*.js')
+// JSHint, concat, and minify JavaScript
+gulp.task('site-js', function() {
+  return gulp.src([
+
+           // Grab your custom scripts
+  		  './assets/js/*.js'
+
+  ])
+    .pipe(babel({
+      presets: ['es2015']
+    }))
+    .pipe(plumber())
     .pipe(jshint())
-    .pipe(jshint.reporter('jshint-stylish'));
-});
-
-
-gulp.task('sass', function() {
-  // Browsers taken from Google Web Starter Kit
-  const AUTOPREFIXER_BROWSERS = [
-      'ie >= 10',
-      'ie_mob >= 10',
-      'ff >= 30',
-      'chrome >= 34',
-      'safari >= 7',
-      'opera >= 23',
-      'ios >= 7',
-      'android >= 4.4',
-      'bb >= 10'
-  ];
-
-  return gulp.src('scss/**/*.scss')
-    .pipe(sourcemaps.init())
-      .pipe(sass())
-      .pipe(autoprefixer(AUTOPREFIXER_BROWSERS))
-      .pipe(cssnano())
-    .pipe(sourcemaps.write())
-    .pipe(gulp.dest('dist/css/'));
-});
-
-
-gulp.task('build-js', function() {
-  return gulp.src('js/**/*.js')
-    .pipe(sourcemaps.init())
-      .pipe(concat('bundle.js'))
-      // uglify if --type p
-      .pipe(gutil.env.type === 'p' ? uglify() : gutil.noop())
-    .pipe(sourcemaps.write())
-    .pipe(gulp.dest('dist/js/'));
-
+    .pipe(jshint.reporter('jshint-stylish'))
+    .pipe(concat('scripts.js'))
+    .pipe(gulp.dest('./dist/js'))
+    .pipe(rename({suffix: '.min'}))
+    .pipe(uglify())
+    .pipe(gulp.dest('./dist/js'))
 });
 
 
 // watch files for changes and reload
-gulp.task('serve', ['sass'], function() {
+gulp.task('serve', ['styles'], function() {
   browserSync({
     notify: false,
     // Customize the Browsersync console logging prefix
@@ -68,13 +69,17 @@ gulp.task('serve', ['sass'], function() {
   });
 
  gulp.watch(['**/*.html'], reload);
- gulp.watch(['scss/*.{scss,css}'], ['sass', reload]);
- gulp.watch(['js/**/*.js'], ['jshint']);
+ gulp.watch(['assets/css/scss/*.{scss,css}'], ['styles', reload]);
+ gulp.watch(['assets/js/**/*.js'], ['site-js', reload]);
  gulp.watch(['images/**/*'], reload);
 });
 
+// Create a default task
+gulp.task('default', function() {
+  gulp.start('styles', 'site-js');
+});
 
 gulp.task('watch', function() {
   gulp.watch('js/**/*.js', ['jshint'] );
-  gulp.watch('scss/**/*.scss', ['sass'])
+  gulp.watch('scss/**/*.scss', ['styles'])
 });
