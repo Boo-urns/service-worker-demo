@@ -1,0 +1,16 @@
+h1 {
+  color: #212121;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 200;
+  letter-spacing: .1rem; }
+
+.flex {
+  display: -ms-flexbox;
+  display: flex; }
+  .flex-fullscreen {
+    height: 100vh; }
+  .flex--centered {
+    -ms-flex-align: center;
+    align-items: center;
+    -ms-flex-pack: center;
+    justify-content: center; }

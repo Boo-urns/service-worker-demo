@@ -1,10 +1,11 @@
 {
-  "name": "knapheide-sweepstakes",
+  "name": "service-worker-demo",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "gulp": "^3.9.1"
+    "gulp": "^3.9.1",
+    "normalize-scss": "^6.0.0"
   },
   "devDependencies": {
     "apache-server-configs": "^2.7.1",
@@ -13,7 +14,7 @@
     "browser-sync": "^2.9.0",
     "del": "^2.0.2",
     "eslint-config-google": "^0.3.0",
-    "gulp": "^3.9.0",
+    "gulp": "^3.9.1",
     "gulp-autoprefixer": "^3.1.0",
     "gulp-babel": "^6.0.0",
     "gulp-bower": "0.0.13",

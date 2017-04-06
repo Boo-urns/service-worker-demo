@@ -2,10 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>TEST</title>
-  <link rel="stylesheet" href="dist/css/styles.css">
+  <title>Service Worker Demo</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+  <link rel="stylesheet" href="dist/css/styles.min.css">
 </head>
 <body>
+  <div class="flex flex-fullscreen flex--centered">
+    <div>
+      <h1>Service Workers</h1>
+      <img src="./assets/img/moss-typing.gif" alt="Moss typing fast" />
+    </div>
+  </div>
 
+  <script>
+    navigator.serviceWorker.register('sw.js')
+      .then(req => console.log('SW Registered!', req))
+      .catch(err => console.log('Error', err));
+  </script>
 </body>
 </html>
